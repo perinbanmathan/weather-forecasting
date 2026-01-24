@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Traffic Rules Violation Checker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f6f9;
+      color: #333;
+    }
+
+    header {
+      background: #007bff;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    form {
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    form h3 {
+      margin-bottom: 15px;
+      color: #444;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    label {
+      font-weight: 600;
+    }
+
+    input, select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 100%;
+    }
+
+    .btn-group {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      background: #007bff;
+      color: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .chart-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .chart-box h3 {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      color: #444;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>🚦 Traffic Rules Violation Checker</header>
+  <main>
+    <form method="POST">
+      <h3>Driver & Junction Details</h3>
+
+      <div class="form-group">
+        <label>Driver Name*:</label>
+        <input type="text" name="driver" placeholder="e.g., Name of person">
+      </div>
+
+      <div class="form-group">
+        <label>Junction Name*:</label>
+        <input type="text" name="junction" placeholder="e.g., Junction 1">
+      </div>
+
+      <div class="form-group">
+        <label>Helmet:</label>
+        <select name="helmet">
+          <option value="yes">Yes</option>
+          <option value="no" selected>No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Signal Color:</label>
+        <select name="signal">
+          <option value="red">Red</option>
+          <option value="green">Green</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Stopped at Signal:</label>
+        <select name="stopped">
+          <option value="yes">Yes</option>
+          <option value="no" selected>No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Speed:</label>
+        <input type="number" name="speed" value="0">
+      </div>
+
+      <div class="form-group">
+        <label>Speed Limit:</label>
+        <input type="number" name="speed_limit" value="0">
+      </div>
+
+      <div class="form-group">
+        <label>Persist Facts?</label>
+        <select name="persist">
+          <option value="yes" selected>Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Mode:</label>
+        <select name="mode">
+          <option value="by_driver">By Driver</option>
+          <option value="by_violation">By Violation</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Violation Label:</label>
+        <input type="text" name="violation_label" placeholder="Helmet Rule Violation">
+      </div>
+
+      <div class="btn-group">
+        <button type="submit" name="action" value="check">Check Violations</button>
+        <button type="submit" name="action" value="first_violation">First Violation (Cut)</button>
+        <button type="submit" name="action" value="list_all_drivers">List All Drivers</button>
+        <button type="submit" name="action" value="list_violators">List Violators</button>
+        <button type="submit" name="action" value="calc_fine">Calculate Fine</button>
+        <button type="submit" name="action" value="check_safe">Check Safe Driver</button>
+        <button type="submit" name="action" value="reset_facts">Reset Facts</button>
+        <button type="submit" name="action" value="remove_driver">Remove Driver</button>
+      </div>
+    </form>
+
+    <!-- Visualization Section -->
+    {% if drivers and violations %}
+    <div class="charts">
+      <div class="chart-box">
+        <h3>📊 Violations by Driver</h3>
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="chart-box">
+        <h3>🥧 Violations Distribution</h3>
+        <canvas id="pieChart"></canvas>
+      </div>
+    </div>
+
+    <script>
+      // ✅ Data passed from Flask
+      const drivers = {{ drivers|tojson|safe }};
+      const violations = {{ violations|tojson|safe }};
+
+      // Bar Chart
+      new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+          labels: drivers,
+          datasets: [{
+            label: "Violations",
+            data: violations,
+            backgroundColor: "rgba(75, 192, 192, 0.6)"
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      // Pie Chart
+      new Chart(document.getElementById('pieChart'), {
+        type: 'pie',
+        data: {
+          labels: drivers,
+          datasets: [{
+            data: violations,
+            backgroundColor: ["#ff6384", "#36a2eb", "#ffce56", "#4bc0c0", "#9966ff"]
+          }]
+        },
+        options: { responsive: true }
+      });
+    </script>
+    {% endif %}
+  </main>
+</body>
+</html>

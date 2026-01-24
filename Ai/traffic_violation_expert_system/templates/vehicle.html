@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="card">
+  <h2>Vehicle: {{ vid }}</h2>
+  <p><strong>Owner:</strong> {{ owner }}</p>
+  <p><strong>Junction:</strong> {{ junction or '—' }}</p>
+  <p><strong>Speed:</strong> {{ speed if speed is not none else '—' }}</p>
+  <p><strong>Speed Limit:</strong> {{ speed_limit if speed_limit is not none else '—' }}</p>
+  <p><strong>Law Abiding:</strong> {{ 'Yes' if law_abiding else 'No' }}</p>
+  <a class="btn" href="{{ url_for('predict', vid=vid) }}">Run Prediction</a>
+</section>
+
+<section class="card">
+  <h3>Violations</h3>
+  {% if violations %}
+    <ul>
+      {% for t in violations %}
+        <li>{{ t }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No violations recorded.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h3>Fine Details</h3>
+  {% if detailed %}
+    <table>
+      <thead><tr><th>Type</th><th>Amount (₹)</th></tr></thead>
+      <tbody>
+        {% for t,a in detailed %}
+          <tr><td>{{ t }}</td><td>{{ a }}</td></tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr><td><strong>Priority Fine (cut)</strong></td><td>{{ priority_fine }}</td></tr>
+        <tr><td><strong>Total Fine (sum)</strong></td><td>{{ total_fine }}</td></tr>
+      </tfoot>
+    </table>
+  {% else %}
+    <p>—</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h3>Update This Vehicle</h3>
+  <form action="{{ url_for('update') }}" method="post" class="grid">
+    <input type="hidden" name="vehicle" value="{{ vid }}">
+
+    <label>Field
+      <select name="field">
+        <option value="helmet">helmet</option>
+        <option value="signal">signal</option>
+        <option value="speed">speed</option>
+        <option value="junction">junction</option>
+        <option value="limit">limit (for current junction)</option>
+      </select>
+    </label>
+
+    <label>Value
+      <input name="value" placeholder="yes/no/number/junctionId" required>
+    </label>
+
+    <button type="submit">Save</button>
+  </form>
+</section>
+
+{% endblock %}

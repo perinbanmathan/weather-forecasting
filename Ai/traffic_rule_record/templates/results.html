@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Result - Traffic Checker</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f9; }
+        h2 { color: #222; }
+        .box { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { background: #e9ecef; padding: 8px; margin: 5px 0; border-radius: 5px; }
+        a { text-decoration: none; color: #007bff; }
+        .chart-container { width: 600px; margin: 30px auto; }
+    </style>
+     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Result</h2>
+
+    {% if mode == "by_driver" %}
+    <div class="box">
+        <h3>Driver: {{ driver }}</h3>
+        <p>Violations:</p>
+        <ul>
+            {% for v in violations %}
+            <li>{{ v }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mode == "by_violation" %}
+    <div class="box">
+        <h3>Violation: {{ violation_label }}</h3>
+        <p>Drivers:</p>
+        <ul>
+            {% for d in drivers_for_violation %}
+            <li>{{ d }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mode == "list_all" %}
+    <div class="box">
+        <h3>{{ violation_label }}</h3>
+        <ul>
+            {% for d in violations %}
+            <li>{{ d }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mode == "first_violation" %}
+    <div class="box">
+        <h3>First Violation (using Cut) for Driver: {{ driver }}</h3>
+        <ul>
+            {% for v in violations %}
+            <li>{{ v }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mode == "negation" %}
+    <div class="box">
+        <h3>Safe Driver Check (Negation)</h3>
+        <p>Driver: {{ driver }}</p>
+        <ul>
+            {% for v in violations %}
+            <li>{{ v }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% elif mode == "arithmetic" %}
+    <div class="box">
+        <h3>Arithmetic Operation: Fine Calculation</h3>
+        <p>Driver: {{ driver }}</p>
+        <ul>
+            {% for v in violations %}
+            <li>{{ v }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <!-- Charts Section -->
+    {% if violations %}
+    <h2>Visualization</h2>
+    <div class="chart-container">
+        <canvas id="violationChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="fineChart"></canvas>
+    </div>
+    
+
+    <script>
+        // ✅ Violations passed from Flask
+        const violations = {{ violations|tojson }};
+        const totalFine = {{ total_fine|default(0) }};
+
+        const violationTypes = ["helmet", "signal", "speed"];
+        const violationCounts = violationTypes.map(type =>
+            violations.filter(v => v.toLowerCase().includes(type)).length
+        );
+
+        const fineMapping = { helmet: 500, signal: 1000, speed: 1500 };
+        const fineDistribution = violationTypes.map(
+            (type, i) => violationCounts[i] * fineMapping[type]
+        );
+
+        // Bar Chart
+        new Chart(document.getElementById('violationChart'), {
+            type: 'bar',
+            data: {
+                labels: violationTypes,
+                datasets: [{
+                    label: 'Number of Violations',
+                    data: violationCounts,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: { responsive: true }
+        });
+
+        // Pie Chart
+        new Chart(document.getElementById('fineChart'), {
+            type: 'pie',
+            data: {
+                labels: violationTypes,
+                datasets: [{
+                    label: 'Fine Distribution',
+                    data: fineDistribution,
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: { responsive: true }
+        });
+    </script>
+    {% endif %}
+    <a href="/">⬅ Back</a>
+</body>
+</html>

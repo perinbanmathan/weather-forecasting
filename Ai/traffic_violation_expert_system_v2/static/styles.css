@@ -1,0 +1,53 @@
+:root { 
+    --bg: #111827; 
+    --card: #1f2937; 
+    --text: #e5e7eb; 
+    --muted: #9ca3af; 
+    --good: #34d399; 
+    --bad: #f87171; 
+    --warn: #fbbf24;
+    --accent: #60a5fa; 
+    --border: #374151;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+header, footer { padding: 1rem 1.5rem; background: #000; border-bottom: 1px solid var(--border); }
+h1, h2, h3 { margin: 0 0 0.5em 0; color: #fff; }
+h1 { font-size: 1.5rem; }
+main { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* Layout */
+.grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; }
+
+/* Cards */
+.card { background: var(--card); border: 1px solid var(--border); padding: 1.5rem; border-radius: 12px; }
+
+/* Badges */
+.badge { padding: 0.25em 0.75em; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
+.badge.good { background-color: #166534; color: #dcfce7; }
+.badge.bad { background-color: #991b1b; color: #fee2e2; }
+.badge.type { background-color: #1e3a8a; color: #dbeafe; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); text-align: left; }
+th { color: var(--muted); font-weight: 600; }
+tfoot td { font-weight: bold; color: #fff; }
+
+/* Severity Rows */
+.severity-critical { background-color: rgba(153, 27, 27, 0.3); }
+.severity-high { background-color: rgba(185, 28, 28, 0.2); }
+.severity-medium { background-color: rgba(217, 119, 6, 0.2); }
+
+/* Forms */
+.grid-form { display: grid; grid-template-columns: 1fr 1fr auto; gap: 1rem; align-items: center; }
+select, button { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; }
+button { cursor: pointer; background: var(--accent); color: var(--bg); font-weight: 600; border-color: var(--accent); }
+
+/* Flash Messages */
+.flash-container { margin-bottom: 1.5rem; }
+.flash { padding: 1rem; border-radius: 8px; border: 1px solid; }
+.flash.success { background-color: #064e3b; border-color: #10b981; color: #d1fae5; }
+.flash.error { background-color: #991b1b; border-color: #f87171; color: #fee2e2; }

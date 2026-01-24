@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results - Traffic Checker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-5px);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .result-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+
+        .icon-driver {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .icon-violation {
+            background: linear-gradient(135deg, #ff4b1f, #ff9068);
+        }
+
+        .icon-list {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        .icon-safe {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+        }
+
+        .icon-fine {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .result-header h2 {
+            color: #333;
+            font-size: 1.8em;
+        }
+
+        .result-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .violations-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .violation-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+        }
+
+        .violation-item.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .violation-item.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .violation-item.danger {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .violation-item.info {
+            border-left-color: #17a2b8;
+            background: #d1ecf1;
+        }
+
+        .violation-icon {
+            font-size: 1.2em;
+        }
+
+        .violation-text {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        .violation-severity {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .severity-high {
+            background: #dc3545;
+            color: white;
+        }
+
+        .severity-medium {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .severity-low {
+            background: #28a745;
+            color: white;
+        }
+
+        .drivers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .driver-card {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e1e1e1;
+            transition: all 0.3s ease;
+        }
+
+        .driver-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        @media (max-width: 768px) {
+            .drivers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+
+        <div class="result-card">
+            {% if mode == "by_driver" %}
+            <div class="result-header">
+                <div class="result-icon icon-driver">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h2>Driver Analysis</h2>
+                    <div class="result-meta">Driver: <strong>{{ driver }}</strong></div>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-number">{{ violations|length }}</div>
+                    <div class="stat-label">Total Violations</div>
+                </div>
+            </div>
+
+            <div class="violations-grid">
+                {% for v in violations %}
+                <div class="violation-item {% if 'No Violations' in v %}success{% elif 'Helmet' in v %}danger{% elif 'Signal' in v %}warning{% elif 'Speed' in v %}danger{% else %}info{% endif %}">
+                    <div class="violation-icon">
+                        {% if 'No Violations' in v %}
+                            <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                        {% elif 'Helmet' in v %}
+                            <i class="fas fa-hard-hat" style="color: #dc3545;"></i>
+                        {% elif 'Signal' in v %}
+                            <i class="fas fa-traffic-light" style="color: #ffc107;"></i>
+                        {% elif 'Speed' in v %}
+                            <i class="fas fa-tachometer-alt" style="color: #dc3545;"></i>
+                        {% else %}
+                            <i class="fas fa-info-circle" style="color: #17a2b8;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="violation-text">{{ v }}</div>
+                    <div class="violation-severity {% if 'No Violations' in v %}severity-low{% elif 'Helmet' in v or 'Speed' in v %}severity-high{% else %}severity-medium{% endif %}">
+                        {% if 'No Violations' in v %}Safe{% elif 'Helmet' in v or 'Speed' in v %}High{% else %}Medium{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% elif mode == "by_violation" %}
+            <div class="result-header">
+                <div class="result-icon icon-violation">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h2>Violation Analysis</h2>
+                    <div class="result-meta">Type: <strong>{{ violation_label }}</strong></div>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-number">{{ drivers_for_violation|length }}</div>
+                    <div class="stat-label">Affected Drivers</div>
+                </div>
+            </div>
+
+            <div class="drivers-grid">
+                {% for d in drivers_for_violation %}
+                <div class="driver-card">
+                    <div class="driver-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <strong>{{ d }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% elif mode == "list_all" %}
+            <div class="result-header">
+                <div class="result-icon icon-list">
+                    <i class="fas fa-list"></i>
+                </div>
+                <div>
+                    <h2>{{ violation_label }}</h2>
+                    <div class="result-meta">Complete listing</div>
+                </div>
+            </div>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-number">{{ violations|length }}</div>
+                    <div class="stat-label">Total Records</div>
+                </div>
+            </div>
+
+            <div class="drivers-grid">
+                {% for d in violations %}
+                <div class="driver-card">
+                    <div class="driver-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <strong>{{ d }}</strong>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% elif mode == "negation" %}
+            <div class="result-header">
+                <div class="result-icon icon-safe">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div>
+                    <h2>Safety Assessment</h2>
+                    <div class="result-meta">Driver: <strong>{{ driver }}</strong></div>
+                </div>
+            </div>
+
+            <div class="violations-grid">
+                {% for v in violations %}
+                <div class="violation-item {% if 'Safe Driver' in v %}success{% else %}danger{% endif %}">
+                    <div class="violation-icon">
+                        {% if 'Safe Driver' in v %}
+                            <i class="fas fa-shield-alt" style="color: #28a745;"></i>
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="violation-text">{{ v }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% elif mode == "arithmetic" %}
+            <div class="result-header">
+                <div class="result-icon icon-fine">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <div>
+                    <h2>Fine Calculation</h2>
+                    <div class="result-meta">Driver: <strong>{{ driver }}</strong></div>
+                </div>
+            </div>
+
+            <div class="violations-grid">
+                {% for v in violations %}
+                <div class="violation-item {% if 'No Fine' in v %}success{% else %}warning{% endif %}">
+                    <div class="violation-icon">
+                        {% if 'No Fine' in v %}
+                            <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                        {% else %}
+                            <i class="fas fa-rupee-sign" style="color: #ffc107;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="violation-text">{{ v }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="actions">
+                <a href="/" class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    New Analysis
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    <i class="fas fa-print"></i>
+                    Print Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-refresh stats or add interactive features here
+        console.log('Result page loaded successfully');
+    </script>
+</body>
+</html>

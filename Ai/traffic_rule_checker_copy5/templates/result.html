@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Results - Traffic Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Inter, system-ui, Arial, sans-serif; background:#f4f7fb; color:#222; margin:0; padding:0; }
+    .container { max-width:1100px; margin:18px auto; padding:12px; }
+    .card { border-radius:10px; box-shadow:0 6px 18px rgba(13,110,253,0.04); padding:14px; background:#fff; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:start; }
+    .compact-list { list-style:none; padding-left:0; margin:0; }
+    .compact-list li { background:#f8fafc; padding:8px 10px; margin-bottom:8px; border-radius:8px; }
+    .badge-score { font-weight:600; }
+    a.back { display:inline-block; margin-top:12px; color:#0d6efd; }
+    @media (max-width:900px){ .grid{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <div class="card">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h4 class="mb-0">Results</h4>
+        <div><small class="text-muted">Driver: <strong>{{ driver or '-' }}</strong></small></div>
+      </div>
+
+      <!-- info / simple messages -->
+      {% if mode == "info" %}
+        <div class="alert alert-info mb-3">
+          {% for m in violations %} <div>{{ m }}</div> {% endfor %}
+        </div>
+      {% endif %}
+
+      <!-- By Driver: show raw violations -->
+      {% if mode == "by_driver" %}
+      <div class="grid">
+        <div>
+          <h5>Violations</h5>
+          <ul class="compact-list">
+            {% for v in violations %}
+              <li>{{ v }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+
+        <div>
+          <h5>Quick Actions</h5>
+          <div>
+            <form method="POST" style="margin:0;">
+              <input type="hidden" name="driver" value="{{ driver }}">
+              <input type="hidden" name="junction" value="">
+              <button class="btn btn-sm btn-info" name="action" value="a_star" type="submit">A* Major</button>
+              <button class="btn btn-sm btn-warning" name="action" value="ao_star" type="submit">AO* Optimize</button>
+              <button class="btn btn-sm btn-success" name="action" value="calc_fine" type="submit">Calc Fine</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- By Violation: show drivers having violation -->
+      {% if mode == "by_violation" %}
+        <h5>Violation: {{ violation_label }}</h5>
+        <ul class="compact-list">
+          {% for d in drivers_for_violation %}
+            <li>{{ d }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- List / general listing -->
+      {% if mode == "list_all" %}
+        <h5>{{ violation_label }}</h5>
+        <ul class="compact-list">
+          {% for d in violations %}
+            <li>{{ d }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- First Violation -->
+      {% if mode == "first_violation" %}
+        <h5>First Violation (using Cut)</h5>
+        <ul class="compact-list">
+          {% for v in violations %}
+            <li>{{ v }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- Negation -->
+      {% if mode == "negation" %}
+        <h5>Safe Driver Check</h5>
+        <ul class="compact-list">
+          {% for v in violations %}
+            <li>{{ v }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- Arithmetic / Fine calculation -->
+      {% if mode == "arithmetic" %}
+        <h5>Fine Calculation</h5>
+        <ul class="compact-list">
+          {% for f in violations %}
+            <li>{{ f.type }} — ₹{{ f.fine }}</li>
+          {% endfor %}
+        </ul>
+        <div class="mt-2"><strong>Total Fine: ₹{{ total_fine }}</strong></div>
+      {% endif %}
+
+      <!-- A* output -->
+      {% if mode == "ai_a_star" %}
+        <h5>A* — Ranked Violations (major first)</h5>
+        <ul class="compact-list">
+          {% for r in ranked %}
+            <li>
+              <div class="d-flex justify-content-between align-items-center">
+                <div><strong>{{ r.type }}</strong><div style="font-size:0.9rem;color:#666">Priority: {{ r.priority }}</div></div>
+                <div class="text-end">
+                  <div>₹{{ r.fine }}</div>
+                  <div class="badge bg-primary badge-score">Score: {{ r.score }}</div>
+                </div>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- AO* output -->
+      {% if mode == "ai_ao_star" %}
+        <h5>AO* — Suggested Combination / Optimization</h5>
+        <ul class="compact-list">
+          {% for s in violations %}
+            <li>
+              <div class="d-flex justify-content-between">
+                <div>{{ s.type }}</div>
+                <div>₹{{ s.fine }}</div>
+              </div>
+              {% if s.note %}<div style="font-size:0.85rem;color:#666">{{ s.note }}</div>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="mt-2"><strong>Total (AO* suggestion): ₹{{ total_fine }}</strong></div>
+      {% endif %}
+
+      <!-- small visualizations for arithmetic or lists -->
+      {% if mode in ["arithmetic","by_driver","ai_a_star"] %}
+        <!-- simple charts for distribution of fines/violations -->
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="card p-2">
+              <canvas id="violChart"></canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card p-2">
+              <canvas id="fineChart"></canvas>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <a class="back" href="/">⬅ Back</a>
+    </div>
+  </main>
+
+<script>
+  // prepare chart data when available
+  {% if mode in ["arithmetic","by_driver","ai_a_star"] %}
+    // Build counts for known violation labels (fallback)
+    const known = ["Helmet Rule Violation","Signal Rule Violation","Speed Limit Violation"];
+    // assemble violations array (strings) depending on mode
+    let rawViol = [];
+    {% if mode == "arithmetic" %}
+      {% for f in violations %}
+        rawViol.push("{{ f.type }}");
+      {% endfor %}
+    {% elif mode == "by_driver" %}
+      {% for v in violations %}
+        rawViol.push("{{ v }}");
+      {% endfor %}
+    {% elif mode == "ai_a_star" %}
+      {% for r in ranked %}
+        rawViol.push("{{ r.type }}");
+      {% endfor %}
+    {% endif %}
+
+    const counts = known.map(k => rawViol.filter(x => x === k).length);
+    const fines = known.map(k => {
+      // try to extract fine by looking for matching items
+      let sum = 0;
+      {% if mode == "arithmetic" %}
+        {% for f in violations %} if ("{{ f.type }}" === k) { sum += {{ f.fine }}; } {% endfor %}
+      {% elif mode == "ai_a_star" %}
+        {% for r in ranked %} if ("{{ r.type }}" === k) { sum += {{ r.fine }}; } {% endfor %}
+      {% else %}
+        // by_driver compute zero/unknown
+      {% endif %}
+      return sum;
+    });
+
+    // Violations count chart
+    new Chart(document.getElementById('violChart'), {
+      type: 'bar',
+      data: {
+        labels: known,
+        datasets: [{ label: 'Count', data: counts }]
+      },
+      options: { responsive: true }
+    });
+
+    // Fines distribution
+    new Chart(document.getElementById('fineChart'), {
+      type: 'pie',
+      data: {
+        labels: known,
+        datasets: [{ label: 'Fines (₹)', data: fines }]
+      },
+      options: { responsive: true }
+    });
+  {% endif %}
+
+ 
+</script>
+
+</body>
+</html>

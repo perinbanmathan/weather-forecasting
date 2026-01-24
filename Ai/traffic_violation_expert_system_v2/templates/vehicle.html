@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid-container">
+    <section class="card">
+      <h2>Vehicle: {{ vid }}</h2>
+      <p><strong>Type:</strong> <span class="badge type">{{ v_type }}</span></p>
+      <p><strong>Owner:</strong> {{ owner }}</p>
+      <p>
+        <strong>Owner's License Status:</strong> 
+        {% if is_at_risk %}
+            <span class="badge bad">At Risk (>= 10 points)</span>
+        {% else %}
+            <span class="badge good">Safe</span>
+        {% endif %}
+      </p>
+    </section>
+
+    <section class="card">
+        <h3>Violations & Fines</h3>
+        {% if violations_details %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Violation</th>
+                        <th>Fine (₹)</th>
+                        <th>Severity</th>
+                        <th>Points</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in violations_details %}
+                    <tr class="severity-{{v.severity}}">
+                        <td>{{ v.type }}</td>
+                        <td>{{ v.amount }}</td>
+                        <td>{{ v.severity }}</td>
+                        <td>{{ v.points }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td><strong>Total</strong></td>
+                        <td><strong>{{ total_fine }}</strong></td>
+                        <td>-</td>
+                        <td><strong>{{ total_points }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        {% else %}
+            <p>No violations found for this vehicle. ✅</p>
+        {% endif %}
+    </section>
+</div>
+
+<section class="card">
+    <h3>Live Update Status</h3>
+    <form action="{{ url_for('update_status') }}" method="post" class="grid-form">
+        <input type="hidden" name="vid" value="{{ vid }}">
+        <select name="status_type">
+            <option value="helmet_worn">Helmet Worn</option>
+            <option value="signal_respected">Signal Respected</option>
+            <option value="puc_valid">PUC Valid</option>
+            <option value="correct_lane">In Correct Lane</option>
+        </select>
+        <select name="new_value">
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+        <button type="submit">Update</button>
+    </form>
+</section>
+{% endblock %}

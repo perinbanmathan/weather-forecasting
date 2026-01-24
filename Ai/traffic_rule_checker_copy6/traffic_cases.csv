@@ -1,0 +1,11 @@
+driver,junction,helmet,signal,stopped,speed,speed_limit
+D1,J1,no,red,no,70,50
+D2,J1,yes,red,yes,40,50
+D3,J2,no,green,yes,60,60
+D4,J3,no,red,no,90,60
+D5,J3,yes,red,no,80,60
+D6,J2,yes,green,yes,45,50
+D7,J1,no,red,yes,60,50
+D8,J4,no,red,no,85,60
+D9,J4,yes,red,yes,55,60
+D10,J5,no,green,yes,70,60

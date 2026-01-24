@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Traffic Rule Violation Checker</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; }
+        h2 { color: #333; }
+        form { background: #fff; padding: 20px; border-radius: 10px; width: 400px; margin: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+        button { margin-top: 15px; padding: 10px; width: 100%; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h2>🚦 Traffic Rule Violation Checker</h2>
+    <form method="POST">
+        <label for="driver">Driver Name:</label>
+        <input type="text" name="driver" required>
+
+        <label for="helmet">Wears Helmet:</label>
+        <select name="helmet" required>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+
+        <label for="junction">Junction Name:</label>
+        <input type="text" name="junction" required>
+
+        <label for="signal">Signal Color:</label>
+        <select name="signal" required>
+            <option value="red">Red</option>
+            <option value="green">Green</option>
+        </select>
+
+        <label for="stopped">Stopped at Signal:</label>
+        <select name="stopped" required>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+        </select>
+
+        <label for="speed">Driver Speed (km/h):</label>
+        <input type="number" name="speed" required>
+
+        <label for="speed_limit">Speed Limit (km/h):</label>
+        <input type="number" name="speed_limit" required>
+
+        <button type="submit">Check Violations ✅</button>
+    </form>
+</body>
+</html>

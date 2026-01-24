@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Violators{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <h4>Drivers with Violations</h4>
+  {% if drivers %}
+    <ul class="list-group mt-2">
+      {% for d in drivers %}<li class="list-group-item">{{ d }}</li>{% endfor %}
+    </ul>
+  {% else %}
+    <p class="text-muted mt-2">No violators found.</p>
+  {% endif %}
+</div>
+{% endblock %}

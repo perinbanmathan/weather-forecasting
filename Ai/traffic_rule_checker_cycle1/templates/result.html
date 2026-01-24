@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Results - Traffic Checker</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <div class="card shadow-lg p-4 rounded-4">
+      <h2 class="text-center text-danger">Results for <b>{{ driver|capitalize }}</b></h2>
+
+      {% if violations %}
+        <h4 class="mt-4">🔴 Raw Violations:</h4>
+        <ul class="list-group mb-4">
+          {% for v in violations %}
+            <li class="list-group-item">{{ v|capitalize }}</li>
+          {% endfor %}
+        </ul>
+
+        <h4 class="mt-4">⭐ A* Ranked Violations:</h4>
+        <div class="row">
+          {% for v in ranked %}
+            <div class="col-md-6">
+              <div class="card border-danger shadow-sm mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">{{ v['Name'] }}</h5>
+                  <p class="card-text">Fine: ₹{{ v['Fine'] }}</p>
+                  <span class="badge bg-danger">Priority: {{ v['Priority'] }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <h4 class="mt-4">⚡ AO* Dependencies:</h4>
+        <div class="row">
+          {% for v in ao %}
+            <div class="col-md-6">
+              <div class="card border-primary shadow-sm mb-3">
+                <div class="card-body">
+                  <h5 class="card-title">{{ v['Name'] }}</h5>
+                  <p class="card-text">Fine: ₹{{ v['Fine'] }}</p>
+                  <span class="badge bg-primary">Priority: {{ v['Priority'] }}</span>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-success mt-4">✅ No violations found for {{ driver|capitalize }}!</div>
+      {% endif %}
+      
+      <div class="text-center mt-4">
+        <a href="/" class="btn btn-outline-secondary">🔙 Check Another</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

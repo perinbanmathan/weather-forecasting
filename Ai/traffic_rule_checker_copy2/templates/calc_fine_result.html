@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Fine Result{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <h5>Driver: <b>{{ driver }}</b></h5>
+  {% if items and items|length > 0 %}
+    <table class="table table-bordered mt-3">
+      <thead class="table-light">
+        <tr><th>Item</th><th>Fine (₹)</th></tr>
+      </thead>
+      <tbody>
+      {% for it in items %}
+        <tr><td>{{ it.type }}</td><td>{{ it.fine }}</td></tr>
+      {% endfor %}
+      <tr class="table-secondary">
+        <td><b>Total</b></td><td><b>₹{{ total }}</b></td>
+      </tr>
+      </tbody>
+    </table>
+  {% else %}
+    <p class="text-muted mt-2">No fines for this driver.</p>
+  {% endif %}
+  <a href="/calc-fine" class="btn btn-link mt-3">← Back</a>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+version: "3.8"
+services:
+  prolog-service:
+    build: ./prolog-service
+    container_name: prolog-service
+    ports:
+      - "5001:5001"
+    networks:
+      - trafficnet
+
+  ml-service:
+    build: ./ml-service
+    container_name: ml-service
+    depends_on:
+      - prolog-service
+    ports:
+      - "5002:5002"
+    networks:
+      - trafficnet
+
+  rl-service:
+    build: ./rl-service
+    container_name: rl-service
+    depends_on:
+      - prolog-service
+    ports:
+      - "5003:5003"
+    networks:
+      - trafficnet
+
+  orchestrator:
+    build: ./orchestrator
+    container_name: orchestrator
+    depends_on:
+      - prolog-service
+      - ml-service
+      - rl-service
+    ports:
+      - "5000:5000"
+    networks:
+      - trafficnet
+
+networks:
+  trafficnet:
+    driver: bridge

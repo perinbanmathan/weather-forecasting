@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Violation Result{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <h5>Violation: <b>{{ violation_label }}</b></h5>
+  <ul class="list-group mt-2">
+    {% for d in drivers %}<li class="list-group-item">{{ d }}</li>{% endfor %}
+  </ul>
+  <a href="/by-violation" class="btn btn-link mt-3">← Back</a>
+</div>
+{% endblock %}

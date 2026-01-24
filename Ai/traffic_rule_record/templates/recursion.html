@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recursion - Traffic Violations</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6f9; }
+    h2 { color: #222; }
+    .box { background: #fff; padding: 20px; border-radius: 8px;
+           box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    ul { list-style-type: none; padding-left: 0; }
+    li { background: #e9ecef; padding: 8px; margin: 5px 0;
+         border-radius: 5px; }
+    input[type=text] {
+      padding: 8px; border: 1px solid #ccc; border-radius: 6px; width: 300px;
+    }
+    button {
+      padding: 8px 14px; border: none; background: #007bff;
+      color: #fff; border-radius: 6px; cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+  </style>
+</head>
+<body>
+  <h2>🔄 Recursion: Collect Violations</h2>
+
+  <div class="box">
+    <form method="POST">
+      <label>Enter Drivers List (Prolog format):</label><br><br>
+      <input type="text" name="drivers_list" placeholder="[driver1, driver2]" 
+             value="{{ drivers_list }}">
+      <button type="submit">Check</button>
+    </form>
+  </div>
+
+  {% if results %}
+  <div class="box">
+    <h3>Results:</h3>
+    <ul>
+      {% for item in results %}
+        <li>
+          <b>{{ item[0] }}</b> → 
+          {% if item[1] %}
+            {{ item[1] }}
+          {% else %}
+            ✅ No Violations
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <a href="/">⬅ Back</a>
+</body>
+</html>

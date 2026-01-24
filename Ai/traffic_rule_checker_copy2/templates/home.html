@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Home · Traffic Checker{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>By Driver</h5>
+      <p class="text-muted">Log an event for a driver at a junction and see violations.</p>
+      <a href="/by-driver" class="btn btn-primary">Open</a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>By Violation</h5>
+      <p class="text-muted">Find drivers who have a specific type of violation.</p>
+      <a href="/by-violation" class="btn btn-primary">Open</a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>All Drivers</h5>
+      <p class="text-muted">See every driver known to the system.</p>
+      <a href="/drivers" class="btn btn-outline-primary">View</a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Violators</h5>
+      <p class="text-muted">Drivers who currently violate any rule.</p>
+      <a href="/violators" class="btn btn-outline-primary">View</a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Safe Check</h5>
+      <p class="text-muted">Check whether a driver is violation-free.</p>
+      <a href="/safe-check" class="btn btn-outline-secondary">Check</a>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h5>Calculate Fine</h5>
+      <p class="text-muted">Itemized fines and total per driver.</p>
+      <a href="/calc-fine" class="btn btn-outline-secondary">Calculate</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

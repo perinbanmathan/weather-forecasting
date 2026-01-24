@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid-container">
+    <section class="card">
+      <h2>All Vehicles</h2>
+      {% if vehicles %}
+        <ul>
+          {% for v in vehicles %}
+            <li>
+              <a href="{{ url_for('vehicle', vid=v.id) }}">{{ v.id }}</a>
+              <span class="badge type">{{ v.type }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No vehicles in the system.</p>
+      {% endif %}
+    </section>
+
+    <section class="card">
+      <h2>Owner Status</h2>
+      {% if owners %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Owner</th>
+                    <th>Total Demerit Points</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for owner in owners %}
+                <tr>
+                    <td>{{ owner }}</td>
+                    <td>{{ owner_points.get(owner, 0) }}</td>
+                    <td>
+                        {% if owner in owners_at_risk %}
+                            <span class="badge bad">License At Risk</span>
+                        {% else %}
+                            <span class="badge good">Safe</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+      {% else %}
+        <p>No owners in the system.</p>
+      {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Safe Check Result{% endblock %}
+{% block content %}
+<div class="card p-4">
+  <h5>Driver: <b>{{ driver }}</b></h5>
+  <p class="{{ 'text-success' if safe else 'text-danger' }}">{{ message }}</p>
+  <a href="/safe-check" class="btn btn-link mt-3">← Back</a>
+</div>
+{% endblock %}
+
